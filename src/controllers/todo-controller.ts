@@ -6,7 +6,7 @@ import {
   ValidationFailure,
 } from '@typings';
 import { NextFunction, Router, Response } from 'express';
-import { createTodoValidator } from '@validators';
+import { createTodoValidator, updateTodoValidator } from '@validators';
 import { BaseController } from './base-controller';
 import { Todo } from '@models';
 
@@ -28,6 +28,11 @@ export class TodoController extends BaseController {
     this.router.delete(`${this.basePath}/:id`, this.deleteTodo);
     this.router.get(`${this.basePath}/:id`, this.getTodo);
     this.router.get(`${this.basePath}`, this.getAllTodos);
+    this.router.put(
+      `${this.basePath}/:id`,
+      updateTodoValidator(this.appContext),
+      this.updateTodo,
+    );
   }
 
   private createTodo = async (
@@ -143,5 +148,31 @@ export class TodoController extends BaseController {
       );
       return next(valError);
     }
+  }
+
+  private updateTodo = async (
+    req: ExtendedRequest,
+    res: Response,
+    next: NextFunction,
+  ) => {
+    const failures: ValidationFailure[] =
+      Validation.extractValidationErrors(req);
+    if (failures.length > 0) {
+      const valError = new Errors.ValidationError(
+        res.__('DEFAULT_ERRORS.VALIDATION_FAILED'),
+        failures,
+      );
+      return next(valError);
+    }
+    const { id } = req.params;
+    const { title } = req.body;
+    const todo = await this.appContext.todoRepository.findOne({ id });
+    if (todo) {
+      const updatedTodo =
+      await this.appContext.todoRepository.update({ _id: id }, { $set: { title } });
+      return res.status(200).json(updatedTodo.serialize());
+    }
+
+    return res.status(404).json({ message: res.__('VALIDATION_ERRORS.RESOURCE_NOT_FOUND') });
   }
 }

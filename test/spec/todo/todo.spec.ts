@@ -91,3 +91,27 @@ describe('GET /todos', () => {
     expect(res).to.have.status(200);
   });
 });
+
+describe('PUT /todos/:id', () => {
+  it('should update an existing todo-item', async () => {
+    const todo = await testAppContext.todoRepository.save(
+      new Todo({
+        title: 'my todo',
+      })
+    );
+    const res = await chai.request(expressApp).put(`/todos/${todo._id}`).send({
+      title: 'my new todo',
+    });
+
+    expect(res).to.have.status(200);
+    expect(res.body).to.have.property('title');
+    expect(res.body).to.have.property('id');
+  });
+
+  it('should return an error in the case of non-existing todo-item', async () => {
+    const res = await chai.request(expressApp).put('/todos/420').send({
+      title: 'item not present in database',
+    });
+    expect(res).to.have.status(400);
+  });
+});
