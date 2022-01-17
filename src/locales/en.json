@@ -4,7 +4,8 @@
     "INTERNAL_SERVER_ERROR": "Internal server error. Please try again later.",
     "LOGIN_AUTHENTICATION_FAILED": "Invalid credentials. Please check your email and password and try again.",
     "RESOURCE_NOT_FOUND": "Requested resource not found.",
-    "VALIDATION_FAILED": "Validation failed. Please modify the request and try again."
+    "VALIDATION_FAILED": "Validation failed. Please modify the request and try again.",
+    "INVALID_REQUEST": "Todo item is not present in the database."
   },
   "VALIDATION_ERRORS": {
     "INVALID_EMAIL": "Please specify valid email address",
