@@ -84,3 +84,10 @@ describe('GET /todos/:id', () => {
     expect(res).to.have.status(400);
   });
 });
+
+describe('GET /todos', () => {
+  it('should return all the todos from the database', async () => {
+    const res = await chai.request(expressApp).get(`/todos`);
+    expect(res).to.have.status(200);
+  });
+});

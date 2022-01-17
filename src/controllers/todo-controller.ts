@@ -27,6 +27,7 @@ export class TodoController extends BaseController {
     );
     this.router.delete(`${this.basePath}/:id`, this.deleteTodo);
     this.router.get(`${this.basePath}/:id`, this.getTodo);
+    this.router.get(`${this.basePath}`, this.getAllTodos);
   }
 
   private createTodo = async (
@@ -112,6 +113,32 @@ export class TodoController extends BaseController {
     } catch (err) {
       const valError = new Errors.ValidationError(
         res.__('DEFAULT_ERRORS.INVALID_REQUEST'),
+        err,
+      );
+      return next(valError);
+    }
+  }
+
+  private getAllTodos = async (
+    req: ExtendedRequest,
+    res: Response,
+    next: NextFunction,
+  ) => {
+    try {
+      const failures: ValidationFailure[] =
+        Validation.extractValidationErrors(req);
+      if (failures.length > 0) {
+        const valError = new Errors.ValidationError(
+          res.__('DEFAULT_ERRORS.VALIDATION_FAILED'),
+          failures,
+        );
+        return next(valError);
+      }
+      const response = await this.appContext.todoRepository.getAll();
+      return res.status(200).json(response.map(todo => todo.serialize()));
+    } catch (err) {
+      const valError = new Errors.ValidationError(
+        res.__('DEFAULT_ERRORS.RESOURCE_NOT_FOUND'),
         err,
       );
       return next(valError);
