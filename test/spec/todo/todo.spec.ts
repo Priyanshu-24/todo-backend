@@ -122,12 +122,14 @@ describe('PUT /todos/:id', () => {
     expect(res).to.have.status(200);
     expect(res.body).to.have.property('title');
     expect(res.body).to.have.property('id');
+
+    expect(res.body.id).to.equal(todo.body.id);
   });
 
   it('should return an error in the case of non-existing todo-item', async () => {
     const res = await chai.request(expressApp).put('/todos/420').send({
       title: 'item not present in database',
     });
-    expect(res).to.have.status(400);
+    expect(res).to.have.status(404);
   });
 });
