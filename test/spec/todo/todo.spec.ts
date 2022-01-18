@@ -63,3 +63,28 @@ describe('DELETE /todos/:id', () => {
     expect(res).to.have.status(400);
   });
 });
+
+describe('GET /todos/:id', () => {
+  it('item is present in the database', async () => {
+    const title = 'my new todo';
+    const response = await testAppContext.todoRepository.save(
+      new Todo({ title })
+    );
+    const res = await chai.request(expressApp).get(`/todos/${response._id}`);
+
+    expect(res).to.have.status(200);
+    expect(res.body).to.have.property('id');
+    expect(res.body).to.have.property('title');
+
+    //both the IDs and title must be equal
+    expect(response.body.id).to.equal(res.body.id);
+    expect(response.body.title).to.equal(res.body.title);
+  });
+
+  it('item is not present in the database', async () => {
+    const id = '420';
+    const res = await chai.request(expressApp).get(`/todos/${id}`);
+
+    expect(res).to.have.status(404);
+  });
+});
