@@ -76,8 +76,9 @@ describe('GET /todos/:id', () => {
     expect(res.body).to.have.property('id');
     expect(res.body).to.have.property('title');
 
-    //both the IDs must be equal
+    //both the IDs and title must be equal
     expect(response.body.id).to.equal(res.body.id);
+    expect(response.body.title).to.equal(res.body.title);
   });
 
   it('item is not present in the database', async () => {
