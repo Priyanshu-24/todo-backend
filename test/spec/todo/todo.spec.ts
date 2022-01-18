@@ -24,7 +24,6 @@ before(async () => {
   expressApp = app.expressApp;
 });
 
-
 describe('POST /todos', () => {
   it('should create a todo when valid title is passed ', async () => {
     const res = await chai.request(expressApp).post('/todos').send({
@@ -36,12 +35,31 @@ describe('POST /todos', () => {
     expect(res.body).to.have.property('title');
   });
 
-  it('should return a validation error if tile is an empty string.', async () => {
+  it('should return a validation error if title is an empty string.', async () => {
     const res = await chai.request(expressApp).post('/todos').send({
       title: '',
     });
 
     expect(res).to.have.status(400);
     expect(res.body.message).to.equal('Please provide a title.');
+  });
+});
+
+describe('DELETE /todos/:id', () => {
+  it('item is present in the database', async () => {
+    const title = 'my new todo';
+    const todoItem = await testAppContext.todoRepository.save(
+      new Todo({ title })
+    );
+    const res = await chai.request(expressApp).delete(`/todos/${todoItem._id}`);
+
+    expect(res).to.have.status(204);
+  });
+
+  it('item is not present in the database', async () => {
+    const id = '420';
+    const res = await chai.request(expressApp).delete(`/todos/${id}`);
+
+    expect(res).to.have.status(400);
   });
 });

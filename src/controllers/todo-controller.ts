@@ -25,6 +25,7 @@ export class TodoController extends BaseController {
       createTodoValidator(this.appContext),
       this.createTodo,
     );
+    this.router.delete(`${this.basePath}/:id`, this.deleteTodo);
   }
 
   private createTodo = async (
@@ -49,5 +50,39 @@ export class TodoController extends BaseController {
       }),
     );
     res.status(201).json(todo.serialize());
+  }
+
+  private deleteTodo = async (
+    req: ExtendedRequest,
+    res: Response,
+    next: NextFunction,
+  ) => {
+    try {
+      const failures: ValidationFailure[] =
+        Validation.extractValidationErrors(req);
+      if (failures.length > 0) {
+        const valError = new Errors.ValidationError(
+          res.__('DEFAULT_ERRORS.VALIDATION_FAILED'),
+          failures,
+        );
+        return next(valError);
+      }
+      const { id } = req.params;
+      const response = await this.appContext.todoRepository.deleteMany({
+        _id: id,
+      });
+      if (response.deletedCount > 0) {
+        res.status(204);
+        res.end();
+      } else {
+        throw new Error('todo not found');
+      }
+    } catch (err) {
+      const valError = new Errors.ValidationError(
+        res.__('DEFAULT_ERRORS.INVALID_REQUEST'),
+        err,
+      );
+      return next(valError);
+    }
   }
 }
