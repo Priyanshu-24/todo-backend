@@ -91,7 +91,19 @@ describe('GET /todos/:id', () => {
 
 describe('GET /todos', () => {
   it('should return all the todos from the database', async () => {
+    const title = 'my todo';
+    const response = await testAppContext.todoRepository.save(
+      new Todo({ title })
+    );
+    expect(response).to.have.status(201);
+
+    const new_title = 'my new todo';
+    const resp = await testAppContext.todoRepository.save(
+      new Todo({ new_title })
+    );
+    expect(resp).to.have.status(201);
+
     const res = await chai.request(expressApp).get(`/todos`);
-    expect(res).to.have.status(200);
+    expect(res).to.have.status(200); // will have two todo-items
   });
 });
